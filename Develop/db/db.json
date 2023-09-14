@@ -2,5 +2,13 @@
     {
         "title":"Test Title",
         "text":"Test text"
+    },
+    {
+        "title":"This is a second example of a title to post!!!",
+        "text":"This is the second example of text to test!!!"
+    },
+    {
+        "title":"This is the third example of a title to post!!!",
+        "text":"This is a third example of a text to test out!!"
     }
 ]
