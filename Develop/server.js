@@ -4,8 +4,7 @@ const path = require('path');
 const app = express();
 const PORT = 3001;
 const notesData = require("./db/db");
-import {v4 as uuidv4} from 'uuid';
-let uuid = uuidv4();
+const { v4: uuidv4 } = require('uuid');
 
 //Express middlewear
 
@@ -31,7 +30,7 @@ app.post('/api/notes', (req, res) => {
         const newNote = {
             title,
             text,
-            note_id: uuid(),
+            note_id: uuidv4(),
         }
         //retrieve the existing notes saved in the JSON
         fs.readFile('./db/db.json', 'utf8', (err, data) => {
@@ -45,7 +44,7 @@ app.post('/api/notes', (req, res) => {
         parsedNotes.push(newNote);
 
         // Write updated reviews back to the file
-        fs.writeFile('./db/reviews.json', JSON.stringify(parsedNotes),
+        fs.writeFile('./db/db.json', JSON.stringify(parsedNotes),
           (writeErr) =>
             writeErr
               ? console.error(writeErr)
@@ -55,7 +54,7 @@ app.post('/api/notes', (req, res) => {
         });
         const response = {
             status: 'success',
-            body: newReview,
+            body: newNote,
           };
 
           console.log(response);
