@@ -3,22 +3,39 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 const PORT = 3001;
-const notesData = require("./db/db");
 const { v4: uuidv4 } = require('uuid');
 
 //Express middlewear
-
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Test route for an example
+// Function to update the variable when the db.json file changes
+const updateNotes = () => {
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            notesData = JSON.parse(data);
+        }
+    });
+}
 
+// Initialize notesData variable
+let notesData = [];
+
+// Initial updates of the variable when the application starts
+updateNotes();
+
+// Sends static files
 app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'notes.html'));
 });
 
-app.get("/api/notes", (req, res) => res.status(200).json(notesData));
+app.get("/api/notes", (req, res) => {
+    res.status(200).json(notesData);
+    console.log(notesData);
+});
 
 app.post('/api/notes', (req, res) => {
     //log that a post request was received
@@ -30,35 +47,28 @@ app.post('/api/notes', (req, res) => {
         const newNote = {
             title,
             text,
-            note_id: uuidv4(),
+            id: uuidv4(),
         }
-        //retrieve the existing notes saved in the JSON
-        fs.readFile('./db/db.json', 'utf8', (err, data) => {
-            if (err) {
-                console.error(err);
-      } else {
-        // Convert string into JSON object
-        const parsedNotes = JSON.parse(data);
+        
+        // Add a new note
+        notesData.push(newNote);
 
-        // Add a new review
-        parsedNotes.push(newNote);
-
-        // Write updated reviews back to the file
-        fs.writeFile('./db/db.json', JSON.stringify(parsedNotes),
-          (writeErr) =>
-            writeErr
-              ? console.error(writeErr)
-              : console.info('Successfully updated Notes!')
-        );
+        // Write updated notes back to the file
+        fs.writeFile('./db/db.json', JSON.stringify(notesData), (writeErr) => {
+            if (writeErr) {
+                console.error(writeErr);
+            } else {
+                console.info('Successfully updated Notes!');
+                updateNotes();
             }
         });
         const response = {
             status: 'success',
             body: newNote,
-          };
+        }
 
-          console.log(response);
-    res.status(201).json(response);
+        console.log(response);
+        res.status(201).json(response);
   } else {
     res.status(500).json('Error in posting review');
   }
