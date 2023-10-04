@@ -10,6 +10,8 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Variable 
+
 // Function to update the variable when the db.json file changes
 const updateNotes = () => {
     fs.readFile('./db/db.json', 'utf8', (err, data) => {
