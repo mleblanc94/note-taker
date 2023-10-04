@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const { v4: uuidv4 } = require('uuid');
 
 //Express middlewear
@@ -10,9 +10,12 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Variable to establish absolute file path vs relative
+dbFilePath = path.join(__dirname, 'db', 'db.json');
+
 // Function to update the variable when the db.json file changes
 const updateNotes = () => {
-    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+    fs.readFile(dbFilePath, 'utf8', (err, data) => {
         if (err) {
             console.error(err);
         } else {
@@ -54,7 +57,7 @@ app.post('/api/notes', (req, res) => {
         notesData.push(newNote);
 
         // Write updated notes back to the file
-        fs.writeFile('./db/db.json', JSON.stringify(notesData), (writeErr) => {
+        fs.writeFile(dbFilePath, JSON.stringify(notesData), (writeErr) => {
             if (writeErr) {
                 console.error(writeErr);
             } else {
